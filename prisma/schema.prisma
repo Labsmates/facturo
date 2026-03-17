@@ -1,0 +1,66 @@
+// This is the Prisma schema for the Facturo application.
+
+// Define the datasource
+
+datasource db {
+  provider = "postgresql" // Choose your database provider
+  url      = env("DATABASE_URL")
+}
+
+// Define the generator
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// User model
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  apiKeys   ApiKey[]
+  clients    Client[]
+  invoices   Invoice[]
+  expenses   Expense[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// API Key model
+model ApiKey {
+  id       Int    @id @default(autoincrement())
+  key      String @unique
+  userId   Int
+  user     User   @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+// Client model
+model Client {
+  id        Int      @id @default(autoincrement())
+  name      String
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  invoices   Invoice[]
+  createdAt DateTime @default(now())
+}
+
+// Invoice model
+model Invoice {
+  id         Int      @id @default(autoincrement())
+  amount     Float
+  clientId   Int
+  userId     Int
+  client     Client   @relation(fields: [clientId], references: [id])
+  user       User     @relation(fields: [userId], references: [id])
+  createdAt  DateTime @default(now())
+}
+
+// Expense model
+model Expense {
+  id         Int      @id @default(autoincrement())
+  amount     Float
+  userId     Int
+  user       User     @relation(fields: [userId], references: [id])
+  createdAt  DateTime @default(now())
+}
